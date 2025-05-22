@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge"
 import { X } from "lucide-react"
 import { CameraIcon } from 'lucide-react'
+import api from "@/api/axios"
 import type { User } from '@/components/UsersComponent/types'
 
 export default function EditUser() {
@@ -15,111 +16,55 @@ export default function EditUser() {
   const navigate = useNavigate()
   const [selectedGroups, setSelectedGroups] = useState<string[]>([])
   const [formData, setFormData] = useState({
-    fullName: "",
-    displayName: "",
-    email: "",
-    phone: "",
+    first_name: "",
+    last_name: "",
+    phone_number: "",
     role: "",
     status: "active",
     address: "",
     city: "",
     state: "",
-    zipCode: "",
+    zipcode: "",
     country: "",
-    timeFormat: "12 Hours",
-    timeZone: ""
+    time_format: "12h",
+    time_zone: "",
+    email: "",
+    password: ""
   })
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    // Simulate fetching user data based on the ID
     const fetchUser = async () => {
       try {
-        // Simulate API call delay
-        await new Promise(resolve => setTimeout(resolve, 1000))
-
-        // Dummy data for the user with the specified ID
-        const dummyUsers: User[] = [
-          {
-            id: 1,
-            name: "Lola Barr",
-            email: "lolabarr@microsoft.ai",
-            phone: "+1-212-456-7890",
-            role: "Admin",
-            status: "Active",
-            lastActive: "10-12-2024",
-            fullName: "Lola Barr",
-            displayName: "Lola",
-            address: "123 Main St",
-            city: "New York",
-            state: "NY",
-            zipCode: "10001",
-            country: "US",
-            timeFormat: "12 Hours",
-            timeZone: "EST"
-          },
-          {
-            id: 2,
-            name: "John Doe",
-            email: "johndoe@example.com",
-            phone: "+1-212-555-7890",
-            role: "User",
-            status: "Active",
-            lastActive: "10-12-2024",
-            fullName: "John Doe",
-            displayName: "John",
-            address: "456 Elm St",
-            city: "Los Angeles",
-            state: "CA",
-            zipCode: "90001",
-            country: "US",
-            timeFormat: "24 Hours",
-            timeZone: "PST"
-          },
-          {
-            id: 3,
-            name: "Jane Smith",
-            email: "janesmith@example.com",
-            phone: "+1-212-555-1234",
-            role: "Guest",
-            status: "Inactive",
-            lastActive: "10-12-2024",
-            fullName: "Jane Smith",
-            displayName: "Jane",
-            address: "789 Oak St",
-            city: "Chicago",
-            state: "IL",
-            zipCode: "60601",
-            country: "US",
-            timeFormat: "12 Hours",
-            timeZone: "CST"
-          },
-        ]
-
-        const userId = parseInt(id || '1', 10)
-        const userData = dummyUsers.find(user => user.id === userId)
-
-        if (userData) {
-          setFormData({
-            fullName: userData.fullName,
-            displayName: userData.displayName,
-            email: userData.email,
-            phone: userData.phone,
-            role: userData.role,
-            status: userData.status.toLowerCase(),
-            address: userData.address,
-            city: userData.city,
-            state: userData.state,
-            zipCode: userData.zipCode,
-            country: userData.country,
-            timeFormat: userData.timeFormat,
-            timeZone: userData.timeZone
-          })
-          setSelectedGroups(["HR Internal"]) // Example groups, adjust as needed
-        } else {
-          throw new Error("User not found")
+        const response = await api.get(`/users/${id}/`)
+        const userData = response.data
+        
+        setFormData({
+          first_name: userData.first_name || "",
+          last_name: userData.last_name || "",
+          phone_number: userData.phone_number || "",
+          role: userData.role || "",
+          status: userData.status || "active",
+          address: userData.address || "",
+          city: userData.city || "",
+          state: userData.state || "",
+          zipcode: userData.zipcode || "",
+          country: userData.country || "",
+          time_format: userData.time_format || "12h",
+          time_zone: userData.time_zone || "",
+          email: userData.email || "",
+          password: "" // Don't pre-fill password for security
+        })
+        
+        if (userData.groups_assigned) {
+          setSelectedGroups(userData.groups_assigned)
         }
-      } catch (error) {
-        console.error("Error fetching user data:", error)
+      } catch (err) {
+        console.error("Error fetching user data:", err)
+        setError("Failed to fetch user data. Please try again later.")
+      } finally {
+        setLoading(false)
       }
     }
 
@@ -141,10 +86,48 @@ export default function EditUser() {
     setFormData(prev => ({ ...prev, [name]: value }))
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    console.log("User updated:", formData)
-    navigate('/users')
+    try {
+      const payload = {
+        ...formData,
+        groups_assigned: selectedGroups
+      }
+      
+      await api.put(`/users/${id}/`, payload)
+      navigate('/users')
+    } catch (err) {
+      console.error("Error updating user:", err)
+      setError("Failed to update user. Please try again.")
+    }
+  }
+
+  if (loading) {
+    return (
+      <div className="flex flex-col h-screen bg-[#F5F5F5]">
+        <main className="flex-1 overflow-auto p-8 flex justify-center items-start pt-18">
+          <div className="w-[1180px] bg-white rounded-lg shadow p-6">
+            <h1 className="text-2xl font-bold text-gray-800">Loading user data...</h1>
+          </div>
+        </main>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="flex flex-col h-screen bg-[#F5F5F5]">
+        <main className="flex-1 overflow-auto p-8 flex justify-center items-start pt-18">
+          <div className="w-[1180px] bg-white rounded-lg shadow p-6">
+            <h1 className="text-2xl font-bold text-gray-800">Error</h1>
+            <p className="text-red-500 mt-4">{error}</p>
+            <Button onClick={() => navigate('/users')} className="mt-4">
+              Back to Users
+            </Button>
+          </div>
+        </main>
+      </div>
+    )
   }
 
   return (
@@ -166,7 +149,7 @@ export default function EditUser() {
                   </div>
                 </div>
                 <div>
-                  <h2 className="text-xl font-semibold">{formData.displayName}</h2>
+                  <h2 className="text-xl font-semibold">{formData.first_name} {formData.last_name}</h2>
                   <Badge variant="outline" className="mt-2 bg-green-100 text-green-800">
                     {formData.status}
                   </Badge>
@@ -182,22 +165,24 @@ export default function EditUser() {
                 {/* Left Column */}
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Full Name*</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">First Name*</label>
                     <Input
-                      name="fullName"
-                      value={formData.fullName}
+                      name="first_name"
+                      value={formData.first_name}
                       onChange={handleChange}
-                      placeholder="Enter full name"
+                      placeholder="Enter first name"
+                      required
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Display Name*</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Last Name*</label>
                     <Input
-                      name="displayName"
-                      value={formData.displayName}
+                      name="last_name"
+                      value={formData.last_name}
                       onChange={handleChange}
-                      placeholder="Enter display name"
+                      placeholder="Enter last name"
+                      required
                     />
                   </div>
 
@@ -209,16 +194,28 @@ export default function EditUser() {
                       value={formData.email}
                       onChange={handleChange}
                       placeholder="Enter email address"
+                      required
                     />
                   </div>
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
                     <Input
-                      name="phone"
-                      value={formData.phone}
+                      name="phone_number"
+                      value={formData.phone_number}
                       onChange={handleChange}
                       placeholder="Enter phone number"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                    <Input
+                      name="password"
+                      type="password"
+                      value={formData.password}
+                      onChange={handleChange}
+                      placeholder="Enter new password"
                     />
                   </div>
                 </div>
@@ -236,9 +233,9 @@ export default function EditUser() {
                           <SelectValue placeholder="Select role" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="Manager">Manager</SelectItem>
-                          <SelectItem value="Recruiter">Recruiter</SelectItem>
-                          <SelectItem value="Admin">Admin</SelectItem>
+                          <SelectItem value="admin">Admin</SelectItem>
+                          <SelectItem value="manager">Manager</SelectItem>
+                          <SelectItem value="recruiter">Recruiter</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
@@ -279,6 +276,7 @@ export default function EditUser() {
                           <button
                             onClick={() => removeGroup(group)}
                             className="ml-1 rounded-full hover:bg-gray-200 p-0.5"
+                            type="button"
                           >
                             <X className="h-3 w-3" />
                           </button>
@@ -320,20 +318,12 @@ export default function EditUser() {
 
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">State</label>
-                      <Select
-                        onValueChange={(value) => setFormData({...formData, state: value})}
+                      <Input
+                        name="state"
                         value={formData.state}
-                      >
-                        <SelectTrigger className="w-full">
-                          <SelectValue placeholder="Select state" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="CA">California</SelectItem>
-                          <SelectItem value="NY">New York</SelectItem>
-                          <SelectItem value="TX">Texas</SelectItem>
-                          <SelectItem value="FL">Florida</SelectItem>
-                        </SelectContent>
-                      </Select>
+                        onChange={handleChange}
+                        placeholder="Enter state"
+                      />
                     </div>
                   </div>
 
@@ -341,8 +331,8 @@ export default function EditUser() {
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">Zip Code</label>
                       <Input
-                        name="zipCode"
-                        value={formData.zipCode}
+                        name="zipcode"
+                        value={formData.zipcode}
                         onChange={handleChange}
                         placeholder="Enter zip code"
                       />
@@ -350,20 +340,12 @@ export default function EditUser() {
 
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">Country</label>
-                      <Select
-                        onValueChange={(value) => setFormData({...formData, country: value})}
+                      <Input
+                        name="country"
                         value={formData.country}
-                      >
-                        <SelectTrigger className="w-full">
-                          <SelectValue placeholder="Select country" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="US">United States</SelectItem>
-                          <SelectItem value="CA">Canada</SelectItem>
-                          <SelectItem value="UK">United Kingdom</SelectItem>
-                          <SelectItem value="AU">Australia</SelectItem>
-                        </SelectContent>
-                      </Select>
+                        onChange={handleChange}
+                        placeholder="Enter country"
+                      />
                     </div>
                   </div>
 
@@ -371,35 +353,27 @@ export default function EditUser() {
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">Time Format</label>
                       <Select
-                        onValueChange={(value) => setFormData({...formData, timeFormat: value})}
-                        value={formData.timeFormat}
+                        onValueChange={(value) => setFormData({...formData, time_format: value})}
+                        value={formData.time_format}
                       >
                         <SelectTrigger className="w-full">
                           <SelectValue placeholder="Select time format" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="12 Hours">12 Hours</SelectItem>
-                          <SelectItem value="24 Hours">24 Hours</SelectItem>
+                          <SelectItem value="12h">12 Hours</SelectItem>
+                          <SelectItem value="24h">24 Hours</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
 
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">Time Zone</label>
-                      <Select
-                        onValueChange={(value) => setFormData({...formData, timeZone: value})}
-                        value={formData.timeZone}
-                      >
-                        <SelectTrigger className="w-full">
-                          <SelectValue placeholder="Select time zone" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="EST">(GMT-5:00) Eastern Time</SelectItem>
-                          <SelectItem value="CST">(GMT-6:00) Central Time</SelectItem>
-                          <SelectItem value="MST">(GMT-7:00) Mountain Time</SelectItem>
-                          <SelectItem value="PST">(GMT-8:00) Pacific Time</SelectItem>
-                        </SelectContent>
-                      </Select>
+                      <Input
+                        name="time_zone"
+                        value={formData.time_zone}
+                        onChange={handleChange}
+                        placeholder="Enter time zone"
+                      />
                     </div>
                   </div>
                 </div>
@@ -407,8 +381,12 @@ export default function EditUser() {
 
               {/* Action Buttons */}
               <div className="flex justify-end space-x-4 mt-8 pt-6 border-t border-gray-200">
-                <Button variant="outline" onClick={() => navigate('/users')}>CANCEL</Button>
-                <Button type="submit" className="bg-blue-500 hover:bg-blue-600">SAVE USER</Button>
+                <Button variant="outline" onClick={() => navigate('/users')} type="button">
+                  CANCEL
+                </Button>
+                <Button type="submit" className="bg-blue-500 hover:bg-blue-600">
+                  SAVE USER
+                </Button>
               </div>
             </form>
           </div>

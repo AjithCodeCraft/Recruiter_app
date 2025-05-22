@@ -61,7 +61,7 @@ export default function SearchBar({ users, setFilteredUsers }: SearchBarProps) {
 
   return (
     <div className="flex flex-col md:flex-row justify-between gap-4 mb-12 relative">
-      <div className="relative w-full md:w-1/3 left-135">
+      <div className="relative w-full md:w-1/3 left-120">
         <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
           <Search className="h-4 w-4 text-gray-400" />
         </div>
