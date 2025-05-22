@@ -3,6 +3,7 @@ from pydantic import BaseModel, EmailStr
 
 class SingleInviteRequest(BaseModel):
     email: EmailStr
+    role: str
     subject: str  
     groups: List[str] = []
 
