@@ -25,4 +25,10 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -
     encoded_jwt = jwt.encode(to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
     return encoded_jwt
 
-# Move OAuth2 and current user dependencies to a separate file
+def generate_invitation_token(email: str,expires_delta: timedelta = None) -> str:
+    if not expires_delta:
+        expires_delta = timedelta(hours=settings.INVITATION_EXPIRE_HOURS)
+    return create_access_token(
+        {"sub": email},
+        expires_delta=expires_delta
+    )
