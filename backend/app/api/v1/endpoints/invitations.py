@@ -23,12 +23,13 @@ def invite_user(
     if user_repo.get_user_by_email(invite_data.email):
         raise HTTPException(status_code=400, detail="Email already registered")
     
-    token = generate_invitation_token(invite_data.email)
+    token = generate_invitation_token(invite_data.email, invite_data.role)
     
     gmail = GmailService()
     success = gmail.send_invitation_email(
         to_email=invite_data.email,
         token=token,
+        role=invite_data.role,
         subject=invite_data.subject  
     )
     
@@ -63,11 +64,12 @@ def bulk_invite_users(
             ))
             continue
         
-        token = generate_invitation_token(invite.email)
+        token = generate_invitation_token(invite.email, invite.role)
         success = gmail.send_invitation_email(
             to_email=invite.email,
             token=token,
-            subject=invite.subject 
+            role=invite.role,
+            subject=invite.subject  
         )
         
         results.append(InvitationResponse(
