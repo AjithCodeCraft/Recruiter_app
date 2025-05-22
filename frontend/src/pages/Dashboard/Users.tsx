@@ -5,8 +5,8 @@ import { Search, ChevronDown, MoreVertical, X, Edit, Trash2, ToggleLeft, ToggleR
 
 export default function UsersManagement() {
   const [activeTab, setActiveTab] = useState("Users")
-  const [selectedRoles, setSelectedRoles] = useState(["Manager", "Admin"])
-  const [selectedGroup, setSelectedGroup] = useState(["HR Internal"])
+  const [selectedRoles, setSelectedRoles] = useState<string[]>([])
+  const [selectedGroup, setSelectedGroup] = useState<string[]>([])
   const [showFilters, setShowFilters] = useState(false)
   const [searchQuery, setSearchQuery] = useState("")
   const [activeDropdown, setActiveDropdown] = useState<number | null>(null)
@@ -90,7 +90,7 @@ export default function UsersManagement() {
         user.email.toLowerCase().includes(searchQuery.toLowerCase())
 
       const matchesRole = selectedRoles.length === 0 || selectedRoles.includes(user.role)
-      const matchesGroup = selectedGroup.length === 0 || true
+      const matchesGroup = selectedGroup.length === 0 || selectedGroup.includes(user.role) // Assuming groups are roles for simplicity
 
       return matchesSearch && matchesRole && matchesGroup
     })
@@ -178,7 +178,7 @@ export default function UsersManagement() {
         </div>
 
         {/* Search and Actions Bar */}
-        <div className="flex flex-col md:flex-row justify-between gap-4 mb-6 relative">
+        <div className="flex flex-col md:flex-row justify-between gap-4 mb-12 relative ">
           <div className="relative w-full md:w-1/3">
             <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
               <Search className="h-4 w-4 text-gray-400" />
@@ -207,9 +207,23 @@ export default function UsersManagement() {
             <div className="absolute top-full left-0 mt-2 border border-gray-200 rounded-md p-4 bg-white shadow-lg z-10 w-full md:w-72">
               <div className="mb-4">
                 <label className="block text-sm font-medium text-gray-700 mb-1">Role</label>
-                <div className="p-2 border border-gray-300 rounded-md min-h-10 flex flex-wrap gap-2">
+                <div className="relative">
+                  <select
+                    className="border border-gray-300 rounded-md p-2 w-full appearance-none pr-8 text-sm"
+                    onChange={(e) => setSelectedRoles([...selectedRoles, e.target.value])}
+                  >
+                    <option value="">Select roles</option>
+                    <option value="Admin">Admin</option>
+                    <option value="Manager">Manager</option>
+                    <option value="Recruiter">Recruiter</option>
+                  </select>
+                  <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
+                    <ChevronDown className="h-4 w-4 text-gray-400" />
+                  </div>
+                </div>
+                <div className="p-2 border border-gray-300 rounded-md min-h-10 flex flex-wrap gap-2 mt-2">
                   {selectedRoles.length === 0 && (
-                    <span className="text-gray-400 text-sm">Select roles</span>
+                    <span className="text-gray-400 text-sm">No roles selected</span>
                   )}
                   {selectedRoles.map((role) => (
                     <div key={role} className="bg-gray-100 rounded-md px-2 py-1 flex items-center text-sm">
@@ -226,24 +240,24 @@ export default function UsersManagement() {
               </div>
 
               <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Group</label>
                 <div className="relative">
-                  <select className="border border-gray-300 rounded-md p-2 w-full appearance-none pr-8 text-sm">
-                    <option>Select status</option>
-                    <option>Active</option>
-                    <option>Inactive</option>
+                  <select
+                    className="border border-gray-300 rounded-md p-2 w-full appearance-none pr-8 text-sm"
+                    onChange={(e) => setSelectedGroup([...selectedGroup, e.target.value])}
+                  >
+                    <option value="">Select groups</option>
+                    <option value="HR Internal">HR Internal</option>
+                    <option value="Development">Development</option>
+                    <option value="Marketing">Marketing</option>
                   </select>
                   <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
                     <ChevronDown className="h-4 w-4 text-gray-400" />
                   </div>
                 </div>
-              </div>
-
-              <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-700 mb-1">Group</label>
-                <div className="p-2 border border-gray-300 rounded-md min-h-10 flex flex-wrap gap-2">
+                <div className="p-2 border border-gray-300 rounded-md min-h-10 flex flex-wrap gap-2 mt-2">
                   {selectedGroup.length === 0 && (
-                    <span className="text-gray-400 text-sm">Select groups</span>
+                    <span className="text-gray-400 text-sm">No groups selected</span>
                   )}
                   {selectedGroup.map((group) => (
                     <div key={group} className="bg-gray-100 rounded-md px-2 py-1 flex items-center text-sm">
@@ -278,9 +292,9 @@ export default function UsersManagement() {
         </div>
 
         {/* Users Table */}
-        <div className="overflow-x-auto max-h-96 overflow-y-auto">
+        <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50 sticky top-0">
+            <thead className="bg-gray-50">
               <tr>
                 <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   <input type="checkbox" className="h-4 w-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500" />
@@ -353,9 +367,10 @@ export default function UsersManagement() {
                     {activeDropdown === user.id && (
                       <div
                         ref={dropdownRef}
-                        className="origin-top-right absolute right-6 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-20"
+                        className="origin-top-right absolute right-6 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-10"
+                        style={{ overflow: 'visible' }}
                       >
-                        <div className="py-1">
+                        <div className="py-1" style={{ overflow: 'hidden' }}>
                           <button
                             onClick={() => editUser(user.id)}
                             className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
