@@ -84,6 +84,8 @@ class UserUpdate(BaseModel):
 class UserInDB(BaseModel):
     id: int
     full_name: str
+    email:str
+    phone_number:str
     role: UserRole
     status: UserStatus
     groups_assigned: List[str]
