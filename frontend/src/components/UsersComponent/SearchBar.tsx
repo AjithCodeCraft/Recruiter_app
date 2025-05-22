@@ -1,10 +1,11 @@
 "use client"
 
-import { useState, useRef } from "react"
+import { useState } from "react"
 import { Search, ChevronDown } from "lucide-react"
-// import FilterPanel from "./FilterPanel"
 import FilterPanel from "./FilterPanel"
-import type { User } from './types' // Use import type for type-only imports
+import type { User } from "./types" // Use import type for type-only imports
+
+import InviteUsersModal from "./invite-users-modal"
 
 interface SearchBarProps {
   users: User[]
@@ -16,6 +17,7 @@ export default function SearchBar({ users, setFilteredUsers }: SearchBarProps) {
   const [selectedRoles, setSelectedRoles] = useState<string[]>([])
   const [selectedGroup, setSelectedGroup] = useState<string[]>([])
   const [showFilters, setShowFilters] = useState(false)
+  const [inviteModalOpen, setInviteModalOpen] = useState(false)
 
   const filterUsers = () => {
     const filtered = users.filter((user) => {
@@ -70,17 +72,19 @@ export default function SearchBar({ users, setFilteredUsers }: SearchBarProps) {
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
         />
-        <button
-          className="absolute inset-y-0 right-2 flex items-center px-2"
-          onClick={toggleFilters}
-        >
-          <ChevronDown className={`h-4 w-4 text-gray-400 transition-transform ${showFilters ? 'rotate-180' : ''}`} />
+        <button className="absolute inset-y-0 right-2 flex items-center px-2" onClick={toggleFilters}>
+          <ChevronDown className={`h-4 w-4 text-gray-400 transition-transform ${showFilters ? "rotate-180" : ""}`} />
         </button>
       </div>
 
-      <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium whitespace-nowrap">
+      <button
+        className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium whitespace-nowrap"
+        onClick={() => setInviteModalOpen(true)}
+      >
         INVITE USERS
       </button>
+
+      <InviteUsersModal open={inviteModalOpen} onOpenChange={setInviteModalOpen} />
 
       {showFilters && (
         <FilterPanel

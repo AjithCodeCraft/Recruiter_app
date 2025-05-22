@@ -6,6 +6,7 @@ import AddUser from './pages/Dashboard/Add-User';
 import UsersManagement from './pages/Dashboard/Users';
 // import DashboardLayout from './layouts/DashboardLayout'; // adjust the import path
 import DashboardLayout from './components/DashboardLayout';
+import EditUser from './pages/Dashboard/Edit-User';
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
           <Route path="/home" element={<Home />} />
           <Route path="/adduser" element={<AddUser />} />
            <Route path="/users" element={<UsersManagement />} />
+           <Route path="/users/edit/:id" element={<EditUser />} />
         </Route>
       </Routes>
     </Router>

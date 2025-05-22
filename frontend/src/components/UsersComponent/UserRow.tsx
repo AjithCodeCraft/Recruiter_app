@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from "react"
 import { MoreVertical, Edit, Trash2, ToggleLeft, ToggleRight } from "lucide-react"
+import { useNavigate } from 'react-router-dom'
 import type { User } from './types' // Use import type for type-only imports
 
 interface UserRowProps {
@@ -15,6 +16,7 @@ interface UserRowProps {
 export default function UserRow({ user, users, filteredUsers, setUsers, setFilteredUsers }: UserRowProps) {
   const [activeDropdown, setActiveDropdown] = useState<number | null>(null)
   const dropdownRef = useRef<HTMLDivElement>(null)
+  const navigate = useNavigate()
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -33,7 +35,7 @@ export default function UserRow({ user, users, filteredUsers, setUsers, setFilte
   }
 
   const editUser = (userId: number) => {
-    console.log("Edit user", userId)
+    navigate(`/users/edit/${userId}`)
     setActiveDropdown(null)
   }
 
