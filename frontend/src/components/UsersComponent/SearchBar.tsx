@@ -18,7 +18,6 @@ export default function SearchBar({ users, setFilteredUsers }: SearchBarProps) {
   const [showFilters, setShowFilters] = useState(false)
   const [inviteModalOpen, setInviteModalOpen] = useState(false)
 
-  // Add useEffect to trigger search when searchQuery or filters change
   useEffect(() => {
     filterUsers()
   }, [searchQuery, selectedRoles, selectedGroup, users])
@@ -65,26 +64,30 @@ export default function SearchBar({ users, setFilteredUsers }: SearchBarProps) {
   }
 
   return (
-    <div className="flex flex-col md:flex-row justify-between gap-4 mb-12 relative">
-      <div className="relative w-full md:w-1/3 left-120">
+<div className="flex flex-col md:flex-row gap-4 mb-10 relative w-full md:relative md:w-120 md:left-140">      {/* Search input container */}
+      <div className="relative flex-1">
         <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
           <Search className="h-4 w-4 text-gray-400" />
         </div>
         <input
           type="text"
-          className="pl-10 pr-4 py-2 border border-gray-300 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+          className="pl-10 pr-8 py-2 border border-gray-300 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
           placeholder="Search by name or email"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
         />
-        <button className="absolute inset-y-0 right-2 flex items-center px-2" onClick={toggleFilters}>
+        <button 
+          className="absolute inset-y-0 right-2 flex items-center px-2"
+          onClick={toggleFilters}
+        >
           <ChevronDown className={`h-4 w-4 text-gray-400 transition-transform ${showFilters ? "rotate-180" : ""}`} />
         </button>
       </div>
 
+      {/* Invite button */}
       <button
-        className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium whitespace-nowrap"
+        className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium whitespace-nowrap md:w-auto w-full"
         onClick={() => setInviteModalOpen(true)}
       >
         INVITE USERS
@@ -92,17 +95,20 @@ export default function SearchBar({ users, setFilteredUsers }: SearchBarProps) {
 
       <InviteUsersModal open={inviteModalOpen} onOpenChange={setInviteModalOpen} />
 
+      {/* Filter panel */}
       {showFilters && (
-        <FilterPanel
-          selectedRoles={selectedRoles}
-          setSelectedRoles={setSelectedRoles}
-          selectedGroup={selectedGroup}
-          setSelectedGroup={setSelectedGroup}
-          removeRole={removeRole}
-          removeGroup={removeGroup}
-          handleSearch={handleSearch}
-          handleReset={handleReset}
-        />
+        <div className="absolute top-full left-0 w-full md:w-96 z-10 mt-2">
+          <FilterPanel
+            selectedRoles={selectedRoles}
+            setSelectedRoles={setSelectedRoles}
+            selectedGroup={selectedGroup}
+            setSelectedGroup={setSelectedGroup}
+            removeRole={removeRole}
+            removeGroup={removeGroup}
+            handleSearch={handleSearch}
+            handleReset={handleReset}
+          />
+        </div>
       )}
     </div>
   )

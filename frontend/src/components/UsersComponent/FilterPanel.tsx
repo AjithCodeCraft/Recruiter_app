@@ -22,13 +22,18 @@ export default function FilterPanel({
   handleReset,
 }: FilterPanelProps) {
   return (
-    <div className="absolute top-full mt-2 border border-gray-200 rounded-md p-4 bg-white shadow-lg z-10 w-full md:w-72 left-148">
+  <div className="border border-gray-200 rounded-md p-4 bg-white shadow-lg w-full md:w-86 min-h-[300px]">
+{/* min-h-[300px] sets minimum height */}
       <div className="mb-4">
         <label className="block text-sm font-medium text-gray-700 mb-1">Role</label>
         <div className="relative">
           <select
             className="border border-gray-300 rounded-md p-2 w-full appearance-none pr-8 text-sm"
-            onChange={(e) => setSelectedRoles([...selectedRoles, e.target.value])}
+            onChange={(e) => {
+              if (e.target.value && !selectedRoles.includes(e.target.value)) {
+                setSelectedRoles([...selectedRoles, e.target.value])
+              }
+            }}
           >
             <option value="">Select roles</option>
             <option value="Admin">Admin</option>
@@ -62,12 +67,16 @@ export default function FilterPanel({
         <div className="relative">
           <select
             className="border border-gray-300 rounded-md p-2 w-full appearance-none pr-8 text-sm"
-            onChange={(e) => setSelectedGroup([...selectedGroup, e.target.value])}
+            onChange={(e) => {
+              if (e.target.value && !selectedGroup.includes(e.target.value)) {
+                setSelectedGroup([...selectedGroup, e.target.value])
+              }
+            }}
           >
             <option value="">Select groups</option>
             <option value="HR Internal">HR Internal</option>
-            <option value="Development">Recruitment RPA</option>
-            <option value="Marketing">Executive</option>
+            <option value="Recruitment RPA">Recruitment RPA</option>
+            <option value="Executive">Executive</option>
           </select>
           <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
             <ChevronDown className="h-4 w-4 text-gray-400" />
