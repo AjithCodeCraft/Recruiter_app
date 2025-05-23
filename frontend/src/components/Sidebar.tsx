@@ -39,6 +39,12 @@ export function Sidebar() {
     setIsOpen(!isOpen)
   }
 
+  const closeSidebarOnMobile = () => {
+    if (isMobile) {
+      setIsOpen(false)
+    }
+  }
+
   return (
     <>
       {/* Mobile toggle button (only shows on mobile) */}
@@ -83,39 +89,46 @@ export function Sidebar() {
             text="Home"
             to="/home"
             isOpen={isOpen}
+            onClick={closeSidebarOnMobile}
           />
           <NavItem 
             icon={<Briefcase size={20} />}
             text="Jobs" 
             to="/jobs"
             isOpen={isOpen}
+            onClick={closeSidebarOnMobile}
           />
           <NavItem 
             icon={<Users size={20} />}
             text="Clients" 
             to="/clients"
             isOpen={isOpen}
+            onClick={closeSidebarOnMobile}
           />
           <NavItem 
             icon={<UserCheck size={20} />}
             text="Users" 
             to="/users"
             isOpen={isOpen}
+            onClick={closeSidebarOnMobile}
           />
         </nav>
 
         {/* Logout Button */}
-<div className="p-4 border-t border-gray-200 mb-15"> {/* Added mt-auto to push it up */}
-  <button
-    onClick={handleLogout}
-    className={`flex items-center w-full p-3 rounded-md text-gray-600 hover:bg-gray-100 transition-colors ${
-      !isOpen ? 'justify-center' : ''
-    }`}
-  >
-    <LogOut size={20} className="mr-3" />
-    {isOpen && <span>Logout</span>}
-  </button>
-</div>
+        <div className="p-4 border-t border-gray-200 mb-15">
+          <button
+            onClick={() => {
+              handleLogout()
+              closeSidebarOnMobile()
+            }}
+            className={`flex items-center w-full p-3 rounded-md text-gray-600 hover:bg-gray-100 transition-colors ${
+              !isOpen ? 'justify-center' : ''
+            }`}
+          >
+            <LogOut size={20} className="mr-3" />
+            {isOpen && <span>Logout</span>}
+          </button>
+        </div>
       </div>
     </>
   )
@@ -125,16 +138,19 @@ function NavItem({
   icon, 
   text, 
   to,
-  isOpen
+  isOpen,
+  onClick
 }: {
   icon: React.ReactNode
   text: string
   to: string
   isOpen: boolean
+  onClick: () => void
 }) {
   return (
     <NavLink
       to={to}
+      onClick={onClick}
       className={({ isActive }) => 
         `flex items-center p-3 rounded-md transition-colors ${
           isActive ? 'bg-[#DDE4EC] text-gray-800' : 'text-gray-600 hover:bg-gray-100'

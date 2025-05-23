@@ -7,9 +7,7 @@ const Home = () => {
     <div className="flex flex-col h-screen bg-[#F5F5F5]">
    
         
-        {/* Main Content Area */}
         <main className="flex-1 p-8 overflow-auto pt-30">
-          {/* Welcome Section - Centered */}
           <div className="mb-8 text-center">
             <h1 className="text-3xl font-bold text-gray-800 mb-5">Welcome User</h1>
             <p className="text-gray-600 max-w-2xl mx-auto">
@@ -17,9 +15,7 @@ const Home = () => {
             </p>
           </div>
 
-          {/* Action Cards - Centered */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 justify-items-center">
-            {/* Create Job Post */}
            <div className="bg-white rounded-lg shadow p-6 w-[300px] h-[200px] flex flex-col items-center justify-between">
   <h3 className="text-lg font-semibold text-gray-800 text-center">Create a Job post</h3>
   <img 
@@ -32,7 +28,6 @@ const Home = () => {
   </button>
 </div>
 
-            {/* Add Clients */}
             <div className="bg-white rounded-lg shadow p-6 w-[300px] h-[200px] flex flex-col items-center justify-between">
   <h3 className="text-lg font-semibold text-gray-800 text-center">Add your Clients</h3>
   <img 
@@ -47,7 +42,6 @@ const Home = () => {
   </Link>
 </div>
 
-            {/* Manage Employees */}
             <div className="bg-white rounded-lg shadow p-6 w-[300px] h-[200px] flex flex-col items-center justify-between">
               <h3 className="text-lg font-semibold text-gray-800 text-center">Manage your Employees</h3>
               <img 

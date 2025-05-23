@@ -1,6 +1,5 @@
 import { Outlet } from 'react-router-dom';
-// import Navbar from '../components/Navbar'; // adjust the import path as needed
-// import Sidebar from '../components/Sidebar'; // adjust the import path as needed
+
 import { Navbar } from './Navbar';
 import { Sidebar } from './Sidebar';
 
@@ -11,7 +10,7 @@ const DashboardLayout = () => {
       <div className="flex flex-1 pt-1.5 overflow-hidden">
         <Sidebar />
         <div className="flex-1 overflow-auto">
-          <Outlet /> {/* This is where child routes will be rendered */}
+          <Outlet /> 
         </div>
       </div>
     </div>

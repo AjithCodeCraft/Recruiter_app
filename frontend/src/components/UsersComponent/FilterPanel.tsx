@@ -23,7 +23,7 @@ export default function FilterPanel({
 }: FilterPanelProps) {
   return (
   <div className="border border-gray-200 rounded-md p-4 bg-white shadow-lg w-full md:w-86 min-h-[300px]">
-{/* min-h-[300px] sets minimum height */}
+
       <div className="mb-4">
         <label className="block text-sm font-medium text-gray-700 mb-1">Role</label>
         <div className="relative">

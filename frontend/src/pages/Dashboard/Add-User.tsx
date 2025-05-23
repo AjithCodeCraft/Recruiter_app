@@ -115,10 +115,8 @@ export default function AddUser() {
             </div>
           </div>
 
-          {/* Form Content */}
           <div className="p-6">
             <div className="grid grid-cols-1 md:grid-cols-1 gap-6">
-              {/* Left Column */}
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Full Name*</label>
@@ -162,7 +160,6 @@ export default function AddUser() {
                 </div>
               </div>
               
-              {/* Right Column */}
               <div className="space-y-2">
                 <div className="grid grid-cols-2 gap-4">
                   <div>

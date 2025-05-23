@@ -7,9 +7,7 @@ export function Navbar({ toggleSidebar }: { toggleSidebar?: () => void }) {
 
   return (
     <header className="bg-white shadow-sm h-16 flex items-center justify-between px-4 sm:px-6 fixed top-0 left-0 right-0 z-10">
-      {/* Left side - Logo and Mobile Menu Button */}
       <div className="flex items-center space-x-4">
-        {/* Mobile menu button (only shows on small screens) */}
         <button 
           onClick={toggleSidebar}
           className="p-2 rounded-full hover:bg-gray-100 transition-colors md:hidden"
@@ -17,7 +15,6 @@ export function Navbar({ toggleSidebar }: { toggleSidebar?: () => void }) {
           <Menu className="h-5 w-5 text-gray-600" />
         </button>
 
-        {/* Logo */}
         <img
           src="/Vector1.png"
           alt="Recruiter Logo"
@@ -25,9 +22,7 @@ export function Navbar({ toggleSidebar }: { toggleSidebar?: () => void }) {
         />
       </div>
 
-      {/* Right side - Icons */}
       <div className="flex items-center space-x-2 sm:space-x-4">
-        {/* (i) Info icon */}
         <button 
           className="p-1 sm:p-2 rounded-full hover:bg-gray-100 transition-colors"
           aria-label="Information"
@@ -35,7 +30,6 @@ export function Navbar({ toggleSidebar }: { toggleSidebar?: () => void }) {
           <Info className="h-5 w-5 text-gray-600" />
         </button>
 
-        {/* Bell icon with notification badge */}
         <button 
           className="p-1 sm:p-2 rounded-full hover:bg-gray-100 transition-colors relative"
           aria-label="Notifications"
@@ -46,7 +40,6 @@ export function Navbar({ toggleSidebar }: { toggleSidebar?: () => void }) {
           </span>
         </button>
 
-        {/* Profile avatar - hidden on very small screens if needed */}
         <div className="flex items-center">
           <img
             src="https://randomuser.me/api/portraits/lego/3.jpg"
