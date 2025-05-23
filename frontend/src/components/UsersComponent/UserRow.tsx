@@ -3,15 +3,17 @@
 import { useState, useRef, useEffect } from "react"
 import { MoreVertical, Edit, Trash2, ToggleLeft, ToggleRight } from "lucide-react"
 import { useNavigate } from 'react-router-dom'
+
 import type { User } from './types' // Use import type for type-only imports
 import api from "@/api/axios"
 import { getCookie } from "@/lib/cookies"
 import toast from "react-hot-toast"
 
+
 interface UserRowProps {
   user: User
-  users: User[] // Add users as a prop
-  filteredUsers: User[] // Add filteredUsers as a prop
+  users: User[]
+  filteredUsers: User[]
   setUsers: (users: User[]) => void
   setFilteredUsers: (users: User[]) => void
 }
@@ -78,7 +80,7 @@ export default function UserRow({ user, users, filteredUsers, setUsers, setFilte
     setUsers(
       users.map((user) => {
         if (user.id === userId) {
-          return { ...user, status: user.status === "Active" ? "Inactive" : "Active" }
+          return { ...user, status: user.status === "active" ? "inactive" : "active" }
         }
         return user
       })
@@ -87,12 +89,16 @@ export default function UserRow({ user, users, filteredUsers, setUsers, setFilte
     setFilteredUsers(
       filteredUsers.map((user) => {
         if (user.id === userId) {
-          return { ...user, status: user.status === "Active" ? "Inactive" : "Active" }
+          return { ...user, status: user.status === "active" ? "inactive" : "active" }
         }
         return user
       })
     )
     setActiveDropdown(null)
+  }
+
+  const capitalizeStatus = (status: string) => {
+    return status.charAt(0).toUpperCase() + status.slice(1)
   }
 
   return (
@@ -104,7 +110,7 @@ export default function UserRow({ user, users, filteredUsers, setUsers, setFilte
         />
       </td>
       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-        {user.name}
+        {user.fullName}
       </td>
       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
         {user.email}
@@ -117,11 +123,11 @@ export default function UserRow({ user, users, filteredUsers, setUsers, setFilte
       </td>
       <td className="px-6 py-4 whitespace-nowrap">
         <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-          user.status === "Active" || "active:"
+          user.status === "active"
             ? "bg-green-100 text-green-800"
             : "bg-red-100 text-red-800"
         }`}>
-          {user.status}
+          {capitalizeStatus(user.status)}
         </span>
       </td>
       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
@@ -160,7 +166,7 @@ export default function UserRow({ user, users, filteredUsers, setUsers, setFilte
                 onClick={() => toggleUserStatus(user.id)}
                 className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
               >
-                {user.status === "Active" ? (
+                {user.status === "active" ? (
                   <>
                     <ToggleLeft className="h-4 w-4 mr-2" />
                     Set Inactive

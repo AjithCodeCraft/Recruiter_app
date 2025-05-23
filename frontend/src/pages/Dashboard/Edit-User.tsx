@@ -9,7 +9,6 @@ import { Badge } from "@/components/ui/badge"
 import { X } from "lucide-react"
 import { CameraIcon } from 'lucide-react'
 import api from "@/api/axios"
-import type { User } from '@/components/UsersComponent/types'
 
 export default function EditUser() {
   const { id } = useParams<{ id: string }>()
@@ -18,6 +17,7 @@ export default function EditUser() {
   const [formData, setFormData] = useState({
     first_name: "",
     last_name: "",
+    full_name: "",
     phone_number: "",
     role: "",
     status: "active",
@@ -40,9 +40,25 @@ export default function EditUser() {
         const response = await api.get(`/users/${id}/`)
         const userData = response.data
         
+        // Handle both full_name and separate first/last name cases
+        let firstName = ""
+        let lastName = ""
+        let fullName = userData.full_name || ""
+
+        if (fullName) {
+          const nameParts = fullName.split(' ')
+          firstName = nameParts[0] || ""
+          lastName = nameParts.slice(1).join(' ') || ""
+        } else {
+          fullName = `${userData.first_name || ""} ${userData.last_name || ""}`.trim()
+          firstName = userData.first_name || ""
+          lastName = userData.last_name || ""
+        }
+
         setFormData({
-          first_name: userData.first_name || "",
-          last_name: userData.last_name || "",
+          first_name: firstName,
+          last_name: lastName,
+          full_name: fullName,
           phone_number: userData.phone_number || "",
           role: userData.role || "",
           status: userData.status || "active",
@@ -54,9 +70,9 @@ export default function EditUser() {
           time_format: userData.time_format || "12h",
           time_zone: userData.time_zone || "",
           email: userData.email || "",
-          password: "" // Don't pre-fill password for security
+          password: ""
         })
-        
+
         if (userData.groups_assigned) {
           setSelectedGroups(userData.groups_assigned)
         }
@@ -72,7 +88,7 @@ export default function EditUser() {
   }, [id])
 
   const addGroup = (group: string) => {
-    if (!selectedGroups.includes(group)) {
+    if (group && !selectedGroups.includes(group)) {
       setSelectedGroups([...selectedGroups, group])
     }
   }
@@ -83,7 +99,14 @@ export default function EditUser() {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
-    setFormData(prev => ({ ...prev, [name]: value }))
+    setFormData(prev => {
+      const updatedData = { ...prev, [name]: value }
+      // Update full_name when first or last name changes
+      if (name === 'first_name' || name === 'last_name') {
+        updatedData.full_name = `${updatedData.first_name} ${updatedData.last_name}`.trim()
+      }
+      return updatedData
+    })
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -91,7 +114,9 @@ export default function EditUser() {
     try {
       const payload = {
         ...formData,
-        groups_assigned: selectedGroups
+        groups_assigned: selectedGroups,
+        // Ensure full_name is included in the payload
+        full_name: formData.full_name || `${formData.first_name} ${formData.last_name}`.trim()
       }
       
       await api.put(`/users/${id}/`, payload)
@@ -100,18 +125,6 @@ export default function EditUser() {
       console.error("Error updating user:", err)
       setError("Failed to update user. Please try again.")
     }
-  }
-
-  if (loading) {
-    return (
-      <div className="flex flex-col h-screen bg-[#F5F5F5]">
-        <main className="flex-1 overflow-auto p-8 flex justify-center items-start pt-18">
-          <div className="w-[1180px] bg-white rounded-lg shadow p-6">
-            <h1 className="text-2xl font-bold text-gray-800">Loading user data...</h1>
-          </div>
-        </main>
-      </div>
-    )
   }
 
   if (error) {
@@ -208,7 +221,7 @@ export default function EditUser() {
                     />
                   </div>
 
-                  <div>
+                  {/* <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
                     <Input
                       name="password"
@@ -217,7 +230,7 @@ export default function EditUser() {
                       onChange={handleChange}
                       placeholder="Enter new password"
                     />
-                  </div>
+                  </div> */}
                 </div>
 
                 {/* Right Column */}
