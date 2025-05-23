@@ -6,6 +6,9 @@ import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
+import toast from "react-hot-toast"
+import api from "@/api/axios"
+import { getCookie } from "@/lib/cookies"
 
 interface EmailEntry {
   id: string
@@ -22,6 +25,7 @@ export default function InviteUsersModal({
   onOpenChange: (open: boolean) => void
 }) {
   const [emailEntries, setEmailEntries] = useState<EmailEntry[]>([{ id: "1", email: "", role: "" }])
+  const [isLoading, setIsLoading] = useState(false)
   const inputRefs = useRef<(HTMLInputElement | null)[]>([])
 
   const validateEmail = (email: string): boolean => {
@@ -107,7 +111,7 @@ export default function InviteUsersModal({
     }
   }
 
-  const handleSendInvite = () => {
+  const handleSendInvite = async () => {
     const entriesWithValidation = emailEntries.map(entry => {
       const emails = entry.email.split(",").filter(e => e.trim())
       const invalidEmails = emails.filter(e => !validateEmail(e.trim()))
@@ -121,7 +125,7 @@ export default function InviteUsersModal({
 
     const hasInvalidEmails = entriesWithValidation.some(entry => entry.error)
     if (hasInvalidEmails) {
-      alert("Please fix invalid email addresses before sending")
+      toast.error("Please fix invalid email addresses before sending")
       return
     }
 
@@ -131,12 +135,56 @@ export default function InviteUsersModal({
     })
 
     if (validEntries.length === 0) {
-      alert("Please add at least one valid email and select a role")
+      toast.error("Please add at least one valid email and select a role")
       return
     }
 
-    console.log("Sending invites to:", validEntries)
-    onOpenChange(false)
+    setIsLoading(true)
+    const token = getCookie('access_token')
+
+    if (!token) {
+      toast.error("Please login to send invites")
+      setIsLoading(false)
+      return
+    }
+
+    try {
+      // Prepare the payload
+      const allEmails = validEntries.flatMap(entry => 
+        entry.email.split(",")
+          .filter(e => e.trim())
+          .map(email => ({
+            email: email.trim(),
+            role: entry.role
+          }))
+      )
+
+      // Determine if we're doing single or bulk invite
+      if (allEmails.length === 1) {
+        // Single invite
+        const { email, role } = allEmails[0]
+        await api.post('/invitations/invite', { email, role }, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        })
+        toast.success(`Invitation sent to ${email}`)
+      } else {
+        // Bulk invite
+        await api.post('/invitations/invite/bulk', { invitations: allEmails }, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        })
+        toast.success(`${allEmails.length} invitations have been sent`)
+      }
+
+      onOpenChange(false)
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || "Failed to send invites")
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   useEffect(() => {
@@ -244,8 +292,12 @@ export default function InviteUsersModal({
           <Button variant="outline" onClick={() => onOpenChange(false)} className="mr-2">
             Cancel
           </Button>
-          <Button onClick={handleSendInvite} className="bg-blue-600 hover:bg-blue-700 px-6">
-            Send Invites
+          <Button 
+            onClick={handleSendInvite} 
+            className="bg-blue-600 hover:bg-blue-700 px-6"
+            disabled={isLoading}
+          >
+            {isLoading ? "Sending..." : "Send Invites"}
           </Button>
         </DialogFooter>
       </DialogContent>

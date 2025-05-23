@@ -29,8 +29,8 @@ def invite_user(
     success = gmail.send_invitation_email(
         to_email=invite_data.email,
         token=token,
-        role=invite_data.role,
-        subject=invite_data.subject  
+        role=invite_data.role
+          
     )
     
     if not success:
@@ -39,7 +39,7 @@ def invite_user(
     return InvitationResponse(
         email=invite_data.email,
         status="sent",
-        message=f"Invitation sent with subject: {invite_data.subject}"
+        message=f"Invitation sent with subject"
     )
 
 @router.post("/invite/bulk", response_model=list[InvitationResponse])
@@ -69,13 +69,13 @@ def bulk_invite_users(
             to_email=invite.email,
             token=token,
             role=invite.role,
-            subject=invite.subject  
+            
         )
         
         results.append(InvitationResponse(
             email=invite.email,
             status="sent" if success else "failed",
-            message=f"Subject: {invite.subject}" if success else "Failed to send"
+            message=f"Subject" if success else "Failed to send"
         ))
     
     return results
