@@ -15,6 +15,6 @@ export type User = {
   country: string
   timeFormat: string
   timeZone: string
-    groupsAssigned?: string[]
+  groupsAssigned?: string[]
 
 }
