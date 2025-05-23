@@ -18,9 +18,8 @@ export default function UsersManagement() {
     const fetchUsers = async () => {
       try {
         const response = await api.get("/users/")
-        // Map API response to User type and filter out admin users
         const apiUsers = response.data
-          .filter((user: any) => user.role !== "admin") // Filter out admin users
+          .filter((user: any) => user.role !== "admin") 
           .map((user: any) => ({
             id: user.id,
             name: user.full_name,
@@ -33,11 +32,9 @@ export default function UsersManagement() {
             state: user.state || "",
             country: user.country || "",
             zipCode: user.zipcode || "",
-            role: user.role === "hiring_manager" 
-      ? "Manager" 
-      : user.role === "recruiter" 
-        ? "Recruiter" 
-        : user.role,
+            role: user.role === "hiring_manager"    ? "Manager"   
+                : user.role === "recruiter" ? "Recruiter" 
+                : user.role,
             status: user.status,
             lastActive: user.updated_at,
             timeFormat: user.time_format,
