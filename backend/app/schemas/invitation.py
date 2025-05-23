@@ -3,13 +3,12 @@ from pydantic import BaseModel, EmailStr
 
 class SingleInviteRequest(BaseModel):
     email: EmailStr
-    role: str
-    subject: str  
+    role: str 
     groups: List[str] = []
 
 class BulkInviteRequest(BaseModel):
     invitations: List[SingleInviteRequest]
-    custom_message: str = ""
+    
 
 class InvitationResponse(BaseModel):
     email: EmailStr
