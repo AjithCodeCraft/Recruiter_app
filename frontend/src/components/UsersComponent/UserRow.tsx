@@ -3,12 +3,10 @@
 import { useState, useRef, useEffect } from "react"
 import { MoreVertical, Edit, Trash2, ToggleLeft, ToggleRight } from "lucide-react"
 import { useNavigate } from 'react-router-dom'
-
-import type { User } from './types' // Use import type for type-only imports
+import type { User } from './types'
 import api from "@/api/axios"
 import { getCookie } from "@/lib/cookies"
 import toast from "react-hot-toast"
-
 
 interface UserRowProps {
   user: User
@@ -22,7 +20,7 @@ export default function UserRow({ user, users, filteredUsers, setUsers, setFilte
   const [activeDropdown, setActiveDropdown] = useState<number | null>(null)
   const dropdownRef = useRef<HTMLDivElement>(null)
   const navigate = useNavigate()
-  const token = getCookie('access_token');
+  const token = getCookie('access_token')
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -48,53 +46,63 @@ export default function UserRow({ user, users, filteredUsers, setUsers, setFilte
   const deleteUser = async (userId: number) => {
     try {
       // Optimistic UI update - remove user immediately
-      setUsers(users.filter((user) => user.id !== userId));
-      setFilteredUsers(filteredUsers.filter((user) => user.id !== userId));
-      setActiveDropdown(null);
-  
+      setUsers(users.filter((user) => user.id !== userId))
+      setFilteredUsers(filteredUsers.filter((user) => user.id !== userId))
+      setActiveDropdown(null)
+
       // Make API call to delete user
-      
       await api.delete(`/users/${userId}`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
-      });
-  
-      toast.success('User deleted successfully');
-      
+      })
+
+      toast.success('User deleted successfully')
     } catch (error) {
       // Revert UI if API call fails
       const originalUsers = await api.get('/users', {
         headers: {
           'Authorization': `Bearer ${token}`
         }
-      });
+      })
       
-      setUsers(originalUsers.data);
-      setFilteredUsers(originalUsers.data);
-      toast.error('Failed to delete user');
+      setUsers(originalUsers.data)
+      setFilteredUsers(originalUsers.data)
+      toast.error('Failed to delete user')
     }
-  };
+  }
 
-  const toggleUserStatus = (userId: number) => {
-    setUsers(
-      users.map((user) => {
-        if (user.id === userId) {
-          return { ...user, status: user.status === "active" ? "inactive" : "active" }
-        }
-        return user
-      })
-    )
+  const toggleUserStatus = async (userId: number) => {
+    const newStatus = user.status === "active" ? "inactive" : "active"
+    
+    try {
+      // Optimistic UI update
+      setUsers(users.map(user => 
+        user.id === userId ? { ...user, status: newStatus } : user
+      ))
+      setFilteredUsers(filteredUsers.map(user => 
+        user.id === userId ? { ...user, status: newStatus } : user
+      ))
+      setActiveDropdown(null)
 
-    setFilteredUsers(
-      filteredUsers.map((user) => {
-        if (user.id === userId) {
-          return { ...user, status: user.status === "active" ? "inactive" : "active" }
+      // API call to update status
+      await api.put(
+        `/users/${userId}`,
+        { status: newStatus },
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
         }
-        return user
-      })
-    )
-    setActiveDropdown(null)
+      )
+
+      toast.success(`User status updated to ${newStatus}`)
+    } catch (error) {
+      // Revert on error
+      setUsers(users)
+      setFilteredUsers(filteredUsers)
+      toast.error("Failed to update user status")
+    }
   }
 
   const capitalizeStatus = (status: string) => {
