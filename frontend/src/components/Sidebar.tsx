@@ -1,46 +1,80 @@
 // components/Sidebar.tsx
-import { Menu, Home, Briefcase, Users, UserCheck, LogOut } from 'lucide-react'
-import { useState } from 'react'
+import { Menu, Home, Briefcase, Users, UserCheck, LogOut, X } from 'lucide-react'
+import { useState, useEffect } from 'react'
 import { NavLink, useNavigate } from 'react-router-dom'
-import { deleteCookie } from '@/lib/cookies' // Import your cookie utility
+import { deleteCookie } from '@/lib/cookies'
 
 export function Sidebar() {
   const [isOpen, setIsOpen] = useState(true)
+  const [isMobile, setIsMobile] = useState(false)
   const navigate = useNavigate()
 
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768)
+      if (window.innerWidth < 768) {
+        setIsOpen(false)
+      } else {
+        setIsOpen(true)
+      }
+    }
+
+    // Set initial state
+    handleResize()
+
+    // Add event listener
+    window.addEventListener('resize', handleResize)
+
+    // Clean up
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
+
   const handleLogout = () => {
-    // 1. Clear the authentication token
     deleteCookie('access_token')
-    
-    // 2. Clear any other user data from storage if needed
-    // localStorage.removeItem('userData')
-    
-    // 3. Redirect to login page
     navigate('/login')
-    
-    // 4. Optional: Force reload to reset application state
     window.location.reload()
   }
 
+  const toggleSidebar = () => {
+    setIsOpen(!isOpen)
+  }
+
   return (
-    <div>  
-      <div className={`flex flex-col h-screen bg-white shadow-md transition-all duration-300 pt-15 ${isOpen ? 'w-64' : 'w-20'}`}>
-        {/* Header with hamburger */}
-        <div className="flex items-center p-4 border-b border-gray-200">
-          {isOpen ? (
-            <h1 className="font-bold text-gray-500">Menu</h1>
-          ) : (
-            <div className="w-8 h-8 flex items-center justify-center">
-              <span className="text-xl font-bold text-gray-800"></span>
-            </div>
-          )}
-          <button 
-            onClick={() => setIsOpen(!isOpen)}
-            className="p-1 rounded-md text-gray-500 hover:bg-gray-100 ml-auto"
-          >
-            <Menu size={20} />
-          </button>
-        </div>
+    <>
+      {/* Mobile toggle button (only shows on mobile) */}
+      {isMobile && (
+        <button
+          onClick={toggleSidebar}
+          className="fixed z-30 left-4 top-4 p-2 rounded-md bg-white shadow-md text-gray-500 md:hidden"
+        >
+          {isOpen ? <X size={20} /> : <Menu size={20} />}
+        </button>
+      )}
+
+      {/* Sidebar */}
+      <div
+        className={`fixed md:relative z-20 flex flex-col h-screen bg-white shadow-md transition-all duration-300 mt-14 ${
+          isOpen ? 'w-64' : 'w-20'
+        } ${isMobile ? (isOpen ? 'left-0' : '-left-20') : ''}`}
+      >
+        {/* Header with hamburger (hidden on mobile) */}
+        {!isMobile && (
+          <div className="flex items-center p-4 border-b border-gray-200">
+            {isOpen ? (
+              <h1 className="font-bold text-gray-500">Menu</h1>
+            ) : (
+              <div className="w-8 h-8 flex items-center justify-center">
+                <span className="text-xl font-bold text-gray-800"></span>
+              </div>
+            )}
+            <button 
+              onClick={toggleSidebar}
+              className="p-1 rounded-md text-gray-500 hover:bg-gray-100 ml-auto"
+            >
+              <Menu size={20} />
+            </button>
+          </div>
+        )}
 
         {/* Navigation */}
         <nav className="flex-1 p-4 space-y-1">
@@ -71,23 +105,22 @@ export function Sidebar() {
         </nav>
 
         {/* Logout Button */}
-        <div className="p-4 border-t border-gray-200">
-          <button
-            onClick={handleLogout}
-            className={`flex items-center w-full p-3 rounded-md text-gray-600 hover:bg-gray-100 transition-colors ${
-              !isOpen ? 'justify-center' : ''
-            }`}
-          >
-            <LogOut size={20} className="mr-3" />
-            {isOpen && <span>Logout</span>}
-          </button>
-        </div>
+<div className="p-4 border-t border-gray-200 mb-15"> {/* Added mt-auto to push it up */}
+  <button
+    onClick={handleLogout}
+    className={`flex items-center w-full p-3 rounded-md text-gray-600 hover:bg-gray-100 transition-colors ${
+      !isOpen ? 'justify-center' : ''
+    }`}
+  >
+    <LogOut size={20} className="mr-3" />
+    {isOpen && <span>Logout</span>}
+  </button>
+</div>
       </div>
-    </div>
+    </>
   )
 }
 
-// NavItem component remains the same
 function NavItem({ 
   icon, 
   text, 
