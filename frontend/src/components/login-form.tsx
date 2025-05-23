@@ -8,6 +8,7 @@ import { useState } from "react";
 import toast from "react-hot-toast";
 import api from "@/api/axios";
 import { setCookie } from "@/lib/cookies";
+import { Eye, EyeOff } from "lucide-react"; // Import eye icons
 
 export function LoginForm({
   className,
@@ -20,6 +21,7 @@ export function LoginForm({
     password: ''
   });
   const [authError, setAuthError] = useState('');
+  const [showPassword, setShowPassword] = useState(false); // State for password visibility
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;
@@ -29,6 +31,10 @@ export function LoginForm({
     }));
 
     if (authError) setAuthError('');
+  };
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -87,15 +93,28 @@ export function LoginForm({
         </div>
         
         <div className="grid gap-3">
-          <Input 
-            id="password"
-            placeholder="Password" 
-            type="password" 
-            required
-            value={formData.password}
-            onChange={handleChange}
-            disabled={isLoading}
-          />
+          <div className="relative">
+            <Input 
+              id="password"
+              placeholder="Password" 
+              type={showPassword ? "text" : "password"} 
+              required
+              value={formData.password}
+              onChange={handleChange}
+              disabled={isLoading}
+            />
+            <button
+              type="button"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+              onClick={togglePasswordVisibility}
+            >
+              {showPassword ? (
+                <EyeOff className="h-5 w-5" />
+              ) : (
+                <Eye className="h-5 w-5" />
+              )}
+            </button>
+          </div>
         </div>
 
         {authError && (
