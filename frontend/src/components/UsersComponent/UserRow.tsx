@@ -4,6 +4,9 @@ import { useState, useRef, useEffect } from "react"
 import { MoreVertical, Edit, Trash2, ToggleLeft, ToggleRight } from "lucide-react"
 import { useNavigate } from 'react-router-dom'
 import type { User } from './types' // Use import type for type-only imports
+import api from "@/api/axios"
+import { getCookie } from "@/lib/cookies"
+import toast from "react-hot-toast"
 
 interface UserRowProps {
   user: User
@@ -17,6 +20,7 @@ export default function UserRow({ user, users, filteredUsers, setUsers, setFilte
   const [activeDropdown, setActiveDropdown] = useState<number | null>(null)
   const dropdownRef = useRef<HTMLDivElement>(null)
   const navigate = useNavigate()
+  const token = getCookie('access_token');
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -39,11 +43,36 @@ export default function UserRow({ user, users, filteredUsers, setUsers, setFilte
     setActiveDropdown(null)
   }
 
-  const deleteUser = (userId: number) => {
-    setUsers(users.filter((user) => user.id !== userId))
-    setFilteredUsers(filteredUsers.filter((user) => user.id !== userId))
-    setActiveDropdown(null)
-  }
+  const deleteUser = async (userId: number) => {
+    try {
+      // Optimistic UI update - remove user immediately
+      setUsers(users.filter((user) => user.id !== userId));
+      setFilteredUsers(filteredUsers.filter((user) => user.id !== userId));
+      setActiveDropdown(null);
+  
+      // Make API call to delete user
+      
+      await api.delete(`/users/${userId}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+  
+      toast.success('User deleted successfully');
+      
+    } catch (error) {
+      // Revert UI if API call fails
+      const originalUsers = await api.get('/users', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      setUsers(originalUsers.data);
+      setFilteredUsers(originalUsers.data);
+      toast.error('Failed to delete user');
+    }
+  };
 
   const toggleUserStatus = (userId: number) => {
     setUsers(
