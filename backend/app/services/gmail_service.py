@@ -13,10 +13,10 @@ class GmailService:
         self.password = settings.GMAIL_PASSWORD
         self.context = ssl.create_default_context()
 
-    def send_invitation_email(self, to_email: str, token: str, subject: str) -> bool:
+    def send_invitation_email(self, to_email: str, token: str, role: str) -> bool:
         try:
             msg = MIMEMultipart('alternative')
-            msg['Subject'] = subject  
+            msg['Subject'] = role  
             msg['From'] = settings.GMAIL_SENDER
             msg['To'] = to_email
 
