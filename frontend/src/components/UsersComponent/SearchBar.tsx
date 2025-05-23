@@ -1,10 +1,9 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Search, ChevronDown } from "lucide-react"
 import FilterPanel from "./FilterPanel"
-import type { User } from "./types" // Use import type for type-only imports
-
+import type { User } from "./types"
 import InviteUsersModal from "./invite-users-modal"
 
 interface SearchBarProps {
@@ -19,6 +18,11 @@ export default function SearchBar({ users, setFilteredUsers }: SearchBarProps) {
   const [showFilters, setShowFilters] = useState(false)
   const [inviteModalOpen, setInviteModalOpen] = useState(false)
 
+  // Add useEffect to trigger search when searchQuery or filters change
+  useEffect(() => {
+    filterUsers()
+  }, [searchQuery, selectedRoles, selectedGroup, users])
+
   const filterUsers = () => {
     const filtered = users.filter((user) => {
       const matchesSearch =
@@ -27,7 +31,8 @@ export default function SearchBar({ users, setFilteredUsers }: SearchBarProps) {
         user.email.toLowerCase().includes(searchQuery.toLowerCase())
 
       const matchesRole = selectedRoles.length === 0 || selectedRoles.includes(user.role)
-      const matchesGroup = selectedGroup.length === 0 || selectedGroup.includes(user.role)
+      const matchesGroup = selectedGroup.length === 0 || 
+        (user.groupsAssigned && user.groupsAssigned.some(group => selectedGroup.includes(group)))
 
       return matchesSearch && matchesRole && matchesGroup
     })
@@ -71,6 +76,7 @@ export default function SearchBar({ users, setFilteredUsers }: SearchBarProps) {
           placeholder="Search by name or email"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
+          onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
         />
         <button className="absolute inset-y-0 right-2 flex items-center px-2" onClick={toggleFilters}>
           <ChevronDown className={`h-4 w-4 text-gray-400 transition-transform ${showFilters ? "rotate-180" : ""}`} />

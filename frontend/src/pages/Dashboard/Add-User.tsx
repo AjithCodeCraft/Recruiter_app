@@ -175,9 +175,10 @@ export default function AddUser() {
                         <SelectValue placeholder="Select role" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="Manager">Manager</SelectItem>
+                        <SelectItem value="admin">Admin</SelectItem>
                         <SelectItem value="Recruiter">Recruiter</SelectItem>
-                        <SelectItem value="Candidate">Candidate</SelectItem>
+                        <SelectItem value="hiring_manager">HR</SelectItem>
+                         <SelectItem value="candidate">Candidate</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>

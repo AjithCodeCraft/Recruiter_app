@@ -66,8 +66,8 @@ export default function FilterPanel({
           >
             <option value="">Select groups</option>
             <option value="HR Internal">HR Internal</option>
-            <option value="Development">Development</option>
-            <option value="Marketing">Marketing</option>
+            <option value="Development">Recruitment RPA</option>
+            <option value="Marketing">Executive</option>
           </select>
           <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
             <ChevronDown className="h-4 w-4 text-gray-400" />

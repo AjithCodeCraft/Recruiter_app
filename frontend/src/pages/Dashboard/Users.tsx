@@ -33,7 +33,11 @@ export default function UsersManagement() {
             state: user.state || "",
             country: user.country || "",
             zipCode: user.zipcode || "",
-            role: user.role,
+            role: user.role === "hiring_manager" 
+      ? "Manager" 
+      : user.role === "recruiter" 
+        ? "Recruiter" 
+        : user.role,
             status: user.status,
             lastActive: user.updated_at,
             timeFormat: user.time_format,
