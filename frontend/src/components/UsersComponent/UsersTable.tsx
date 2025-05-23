@@ -1,8 +1,7 @@
 "use client"
 
 import UserRow from "./UserRow"
-import type { User } from './types' // Use import type for type-only imports
-
+import type { User } from './types' 
 interface UsersTableProps {
   users: User[]
   setUsers: (users: User[]) => void
@@ -16,7 +15,6 @@ export default function UsersTable({ users, setUsers, setFilteredUsers }: UsersT
         <thead className="bg-gray-50">
           <tr>
             <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              {/* <input type="checkbox" className="h-4 w-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500" /> */}
             </th>
             <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
               Name
@@ -47,7 +45,7 @@ export default function UsersTable({ users, setUsers, setFilteredUsers }: UsersT
               key={user.id} 
               user={user} 
               users={users}
-              filteredUsers={users} // Replace with actual filteredUsers if available
+              filteredUsers={users}
               setUsers={setUsers} 
               setFilteredUsers={setFilteredUsers} 
             />

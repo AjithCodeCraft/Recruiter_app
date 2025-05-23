@@ -233,7 +233,6 @@ export default function EditUser() {
                   </div> */}
                 </div>
 
-                {/* Right Column */}
                 <div className="space-y-2">
                   <div className="grid grid-cols-2 gap-4">
                     <div>

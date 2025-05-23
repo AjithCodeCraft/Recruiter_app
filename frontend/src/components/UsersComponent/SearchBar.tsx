@@ -85,7 +85,7 @@ export default function SearchBar({ users, setFilteredUsers }: SearchBarProps) {
         </button>
       </div>
 
-      {/* Invite button */}
+ 
       <button
         className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium whitespace-nowrap md:w-auto w-full"
         onClick={() => setInviteModalOpen(true)}

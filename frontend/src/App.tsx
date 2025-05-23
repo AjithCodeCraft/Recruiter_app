@@ -4,7 +4,7 @@ import RegisterPage from "./pages/auth/Register";
 import Home from './pages/Dashboard/Home'; 
 import AddUser from './pages/Dashboard/Add-User';
 import UsersManagement from './pages/Dashboard/Users';
-// import DashboardLayout from './layouts/DashboardLayout'; // adjust the import path
+// import DashboardLayout from './layouts/DashboardLayout'; 
 import DashboardLayout from './components/DashboardLayout';
 import EditUser from './pages/Dashboard/Edit-User';
 
@@ -16,7 +16,6 @@ function App() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
         
-        {/* Routes that use the dashboard layout */}
         <Route element={<DashboardLayout />}>
           <Route path="/home" element={<Home />} />
           <Route path="/adduser" element={<AddUser />} />

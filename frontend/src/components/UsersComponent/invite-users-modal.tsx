@@ -149,7 +149,7 @@ export default function InviteUsersModal({
     }
 
     try {
-      // Prepare the payload
+   
       const allEmails = validEntries.flatMap(entry => 
         entry.email.split(",")
           .filter(e => e.trim())
@@ -159,7 +159,6 @@ export default function InviteUsersModal({
           }))
       )
 
-      // Determine if we're doing single or bulk invite
       if (allEmails.length === 1) {
         // Single invite
         const { email, role } = allEmails[0]

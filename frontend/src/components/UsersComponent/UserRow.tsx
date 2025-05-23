@@ -59,12 +59,10 @@ export default function UserRow({ user, users, filteredUsers, setUsers, setFilte
 
   const handleConfirmDelete = async (userId: number) => {
     try {
-      // Optimistic UI update - remove user immediately
       setUsers(users.filter((user) => user.id !== userId))
       setFilteredUsers(filteredUsers.filter((user) => user.id !== userId))
       setActiveDropdown(null)
 
-      // Make API call to delete user
       await api.delete(`/users/${userId}`, {
         headers: {
           'Authorization': `Bearer ${token}`
@@ -73,7 +71,6 @@ export default function UserRow({ user, users, filteredUsers, setUsers, setFilte
 
       toast.success('User deleted successfully')
     } catch (error) {
-      // Revert UI if API call fails
       const originalUsers = await api.get('/users', {
         headers: {
           'Authorization': `Bearer ${token}`
@@ -90,7 +87,6 @@ export default function UserRow({ user, users, filteredUsers, setUsers, setFilte
     const newStatus = user.status === "active" ? "inactive" : "active"
 
     try {
-      // Optimistic UI update
       setUsers(users.map(user =>
         user.id === userId ? { ...user, status: newStatus } : user
       ))
@@ -99,7 +95,6 @@ export default function UserRow({ user, users, filteredUsers, setUsers, setFilte
       ))
       setActiveDropdown(null)
 
-      // API call to update status
       await api.put(
         `/users/${userId}`,
         { status: newStatus },
@@ -112,7 +107,6 @@ export default function UserRow({ user, users, filteredUsers, setUsers, setFilte
 
       toast.success(`User status updated to ${newStatus}`)
     } catch (error) {
-      // Revert on error
       setUsers(users)
       setFilteredUsers(filteredUsers)
       toast.error("Failed to update user status")
