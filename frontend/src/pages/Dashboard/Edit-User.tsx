@@ -247,7 +247,7 @@ export default function EditUser() {
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="admin">Admin</SelectItem>
-                          <SelectItem value="manager">Manager</SelectItem>
+                          <SelectItem value="hiring_manager">Manager</SelectItem>
                           <SelectItem value="recruiter">Recruiter</SelectItem>
                         </SelectContent>
                       </Select>
