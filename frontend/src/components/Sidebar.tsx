@@ -1,66 +1,93 @@
 // components/Sidebar.tsx
-import { Menu, Home, Briefcase, Users, UserCheck } from 'lucide-react'
+import { Menu, Home, Briefcase, Users, UserCheck, LogOut } from 'lucide-react'
 import { useState } from 'react'
-import { NavLink } from 'react-router-dom'
+import { NavLink, useNavigate } from 'react-router-dom'
+import { deleteCookie } from '@/lib/cookies' // Import your cookie utility
 
 export function Sidebar() {
   const [isOpen, setIsOpen] = useState(true)
+  const navigate = useNavigate()
+
+  const handleLogout = () => {
+    // 1. Clear the authentication token
+    deleteCookie('access_token')
+    
+    // 2. Clear any other user data from storage if needed
+    // localStorage.removeItem('userData')
+    
+    // 3. Redirect to login page
+    navigate('/login')
+    
+    // 4. Optional: Force reload to reset application state
+    window.location.reload()
+  }
 
   return (
-    <div >  
-    <div className={`flex flex-col h-screen bg-white shadow-md transition-all duration-300 pt-15  ${isOpen ? 'w-64' : 'w-20'}`}>
-      {/* Header with hamburger */}
-      <div className="flex items-center p-4 border-b border-gray-200">
-        {isOpen ? (
-          <h1 className=" font-bold text-gray-500">Menu</h1>
-        ) : (
-          <div className="w-8 h-8 flex items-center justify-center">
-            <span className="text-xl font-bold text-gray-800"></span>
-          </div>
-        )}
-        <button 
-          onClick={() => setIsOpen(!isOpen)}
-          className="p-1 rounded-md text-gray-500 hover:bg-gray-100 ml-auto"
-        >
-          <Menu size={20} />
-        </button>
-      </div>
+    <div>  
+      <div className={`flex flex-col h-screen bg-white shadow-md transition-all duration-300 pt-15 ${isOpen ? 'w-64' : 'w-20'}`}>
+        {/* Header with hamburger */}
+        <div className="flex items-center p-4 border-b border-gray-200">
+          {isOpen ? (
+            <h1 className="font-bold text-gray-500">Menu</h1>
+          ) : (
+            <div className="w-8 h-8 flex items-center justify-center">
+              <span className="text-xl font-bold text-gray-800"></span>
+            </div>
+          )}
+          <button 
+            onClick={() => setIsOpen(!isOpen)}
+            className="p-1 rounded-md text-gray-500 hover:bg-gray-100 ml-auto"
+          >
+            <Menu size={20} />
+          </button>
+        </div>
 
-      {/* Navigation */}
-      <nav className="flex-1 p-4 space-y-1">
-        <NavItem 
-          icon={<Home size={20} /> }
-          text="Home"
-          to="/home"
-          isOpen={isOpen}
-        />
-        <NavItem 
-          icon={<Briefcase size={20} /> }
-          text="Jobs" 
-          to="/jobs"
-          isOpen={isOpen}
-        />
-        <NavItem 
-          icon={<Users size={20} /> }
-          text="Clients" 
-          to="/clients"
-          isOpen={isOpen}
-        />
-        
-        {/* Users section */}
-        <NavItem 
-          icon={<UserCheck size={20} /> }
-          text="Users" 
-          to="/users"
-          isOpen={isOpen}
-        />
-      </nav>
+        {/* Navigation */}
+        <nav className="flex-1 p-4 space-y-1">
+          <NavItem 
+            icon={<Home size={20} />}
+            text="Home"
+            to="/home"
+            isOpen={isOpen}
+          />
+          <NavItem 
+            icon={<Briefcase size={20} />}
+            text="Jobs" 
+            to="/jobs"
+            isOpen={isOpen}
+          />
+          <NavItem 
+            icon={<Users size={20} />}
+            text="Clients" 
+            to="/clients"
+            isOpen={isOpen}
+          />
+          <NavItem 
+            icon={<UserCheck size={20} />}
+            text="Users" 
+            to="/users"
+            isOpen={isOpen}
+          />
+        </nav>
+
+        {/* Logout Button */}
+        <div className="p-4 border-t border-gray-200">
+          <button
+            onClick={handleLogout}
+            className={`flex items-center w-full p-3 rounded-md text-gray-600 hover:bg-gray-100 transition-colors ${
+              !isOpen ? 'justify-center' : ''
+            }`}
+          >
+            <LogOut size={20} className="mr-3" />
+            {isOpen && <span>Logout</span>}
+          </button>
+        </div>
+      </div>
     </div>
-    </div>
-    
   )
 }
 
+// NavItem component remains the same
 function NavItem({ 
   icon, 
   text, 
