@@ -7,6 +7,14 @@ import type { User } from './types'
 import api from "@/api/axios"
 import { getCookie } from "@/lib/cookies"
 import toast from "react-hot-toast"
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter
+} from "@/components/ui/dialog" 
+import { Button } from "@/components/ui/button"
 
 interface UserRowProps {
   user: User
@@ -21,6 +29,7 @@ export default function UserRow({ user, users, filteredUsers, setUsers, setFilte
   const dropdownRef = useRef<HTMLDivElement>(null)
   const navigate = useNavigate()
   const token = getCookie('access_token')
+  const [userToDelete, setUserToDelete] = useState<User | null>(null);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -43,7 +52,12 @@ export default function UserRow({ user, users, filteredUsers, setUsers, setFilte
     setActiveDropdown(null)
   }
 
-  const deleteUser = async (userId: number) => {
+  const promptDelete = (user: User) => {
+    setUserToDelete(user);
+    setActiveDropdown(null);
+  };
+
+  const handleConfirmDelete = async (userId: number) => {
     try {
       // Optimistic UI update - remove user immediately
       setUsers(users.filter((user) => user.id !== userId))
@@ -65,7 +79,7 @@ export default function UserRow({ user, users, filteredUsers, setUsers, setFilte
           'Authorization': `Bearer ${token}`
         }
       })
-      
+
       setUsers(originalUsers.data)
       setFilteredUsers(originalUsers.data)
       toast.error('Failed to delete user')
@@ -74,13 +88,13 @@ export default function UserRow({ user, users, filteredUsers, setUsers, setFilte
 
   const toggleUserStatus = async (userId: number) => {
     const newStatus = user.status === "active" ? "inactive" : "active"
-    
+
     try {
       // Optimistic UI update
-      setUsers(users.map(user => 
+      setUsers(users.map(user =>
         user.id === userId ? { ...user, status: newStatus } : user
       ))
-      setFilteredUsers(filteredUsers.map(user => 
+      setFilteredUsers(filteredUsers.map(user =>
         user.id === userId ? { ...user, status: newStatus } : user
       ))
       setActiveDropdown(null)
@@ -130,11 +144,10 @@ export default function UserRow({ user, users, filteredUsers, setUsers, setFilte
         {user.role}
       </td>
       <td className="px-6 py-4 whitespace-nowrap">
-        <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-          user.status === "active"
+        <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${user.status === "active"
             ? "bg-green-100 text-green-800"
             : "bg-red-100 text-red-800"
-        }`}>
+          }`}>
           {capitalizeStatus(user.status)}
         </span>
       </td>
@@ -148,6 +161,31 @@ export default function UserRow({ user, users, filteredUsers, setUsers, setFilte
         >
           <MoreVertical className="h-5 w-5" />
         </button>
+
+        {userToDelete && (
+          <Dialog open={!!userToDelete} onOpenChange={() => setUserToDelete(null)}>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Confirm Deletion</DialogTitle>
+              </DialogHeader>
+              <p>Are you sure you want to delete {userToDelete.fullName}?</p>
+              <DialogFooter>
+                <Button variant="outline" onClick={() => setUserToDelete(null)}>
+                  Cancel
+                </Button>
+                <Button
+                  variant="destructive"
+                  onClick={() => {
+                    handleConfirmDelete(userToDelete.id);
+                    setUserToDelete(null);
+                  }}
+                >
+                  Delete
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+        )}
 
         {activeDropdown === user.id && (
           <div
@@ -164,7 +202,7 @@ export default function UserRow({ user, users, filteredUsers, setUsers, setFilte
                 Edit User
               </button>
               <button
-                onClick={() => deleteUser(user.id)}
+                onClick={() => promptDelete(user)}
                 className="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
               >
                 <Trash2 className="h-4 w-4 mr-2" />
