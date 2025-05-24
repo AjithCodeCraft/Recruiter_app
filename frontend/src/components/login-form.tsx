@@ -6,22 +6,23 @@ import { Input } from "@/components/ui/input";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import toast from "react-hot-toast";
-import api from "@/api/axios";
-import { setCookie } from "@/lib/cookies";
-import { Eye, EyeOff } from "lucide-react"; // Import eye icons
+import { Eye, EyeOff } from "lucide-react";
+import { useAuth } from '@/context/AuthContext';
+
 
 export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"form">) {
   const navigate = useNavigate();
+  const { login } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     email: '',
     password: ''
   });
   const [authError, setAuthError] = useState('');
-  const [showPassword, setShowPassword] = useState(false); // State for password visibility
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;
@@ -43,21 +44,8 @@ export function LoginForm({
     setAuthError('');
 
     try {
-      const params = new URLSearchParams();
-      params.append('username', formData.email);
-      params.append('password', formData.password);
-
-      const response = await api.post('/auth/login', params.toString(), {
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded'
-        }
-      });
-
-      if (response.data.access_token) {
-        setCookie('access_token', response.data.access_token, 1); 
-        toast.success('Login successful!');
-        navigate('/home');
-      }
+      await login(formData.email, formData.password);
+      toast.success('Login successful!');
     } catch (error: any) {
       if (error.response?.status === 401) {
         setAuthError('Incorrect username or password');
@@ -68,6 +56,7 @@ export function LoginForm({
       setIsLoading(false);
     }
   };
+
 
   return (
     <form 
