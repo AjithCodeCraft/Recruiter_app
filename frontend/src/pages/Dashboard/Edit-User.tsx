@@ -330,12 +330,20 @@ export default function EditUser() {
 
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">State</label>
-                      <Input
-                        name="state"
-                        value={formData.state}
-                        onChange={handleChange}
-                        placeholder="Enter state"
-                      />
+                         <Select 
+                      onValueChange={(value) => setFormData({...formData, state: value})}
+                      value={formData.state}
+                    >
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Select state" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Kerala">Kerala</SelectItem>
+                        <SelectItem value="Tamil Nadu">Tamil Nadu</SelectItem>
+                        <SelectItem value="Karnataka">Karnataka</SelectItem>
+                        <SelectItem value="Maharashtra">Maharashtra</SelectItem>
+                      </SelectContent>
+                    </Select>
                     </div>
                   </div>
 
